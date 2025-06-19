@@ -305,7 +305,8 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 							<Table>
 								<TableBody>
 									<TableRow><TableCell className="font-medium">Market Cap</TableCell><TableCell className="text-right">{stock.marketCap?.toLocaleString() || "N/A"}</TableCell></TableRow>
-									<TableRow><TableCell className="font-medium">P/E Ratio</TableCell><TableCell className="text-right">{stock.peRatio?.toFixed(2) || "N/A"}</TableCell></TableRow>
+									<TableRow><TableCell className="font-medium">Trailing P/E Ratio</TableCell><TableCell className="text-right">{stock.trailingPERatio?.toFixed(2) || "N/A"}</TableCell></TableRow>
+									<TableRow><TableCell className="font-medium">Forward P/E Ratio</TableCell><TableCell className="text-right">{stock.forwardPERatio?.toFixed(2) || "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">Dividend Yield</TableCell><TableCell className="text-right">{stock.dividendYield ? `${(stock.dividendYield * 100).toFixed(2)}%` : "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">52-Week High</TableCell><TableCell className="text-right">${stock.high52Week?.toFixed(2) || "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">52-Week Low</TableCell><TableCell className="text-right">${stock.low52Week?.toFixed(2) || "N/A"}</TableCell></TableRow>
