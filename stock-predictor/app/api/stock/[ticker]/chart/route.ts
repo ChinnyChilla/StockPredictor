@@ -48,9 +48,9 @@ const getChartOptions = (range: string) => {
 
 export async function GET(
 	request: Request,
-	{ params }: { params: { ticker: string } }
+	{ params }: { params: Promise<{ ticker: string }> }
 ) {
-	const ticker = params.ticker
+	const { ticker } = await params;
 	const { searchParams } = new URL(request.url)
 	const range = searchParams.get("range") || "1D"
 

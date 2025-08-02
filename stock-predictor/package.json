@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --debug",
     "start": "next start",
     "lint": "next lint"
   },
@@ -15,9 +15,9 @@
     "clsx": "^2.1.1",
     "finnhub": "^1.2.19",
     "lucide-react": "^0.515.0",
-    "next": "15.3.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "next": "^15.4.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.1",
     "yahoo-finance2": "^2.13.3"

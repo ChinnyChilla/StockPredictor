@@ -20,7 +20,6 @@ def get_earnings_calendar():
 		if not api_key:
 			raise Exception("Finnhub API key is not configured.")
 
-		# Initialize the Finnhub client
 		finnhub_client = finnhub.Client(api_key=api_key)
 
 		today = datetime.now()

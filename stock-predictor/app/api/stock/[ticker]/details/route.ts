@@ -3,9 +3,9 @@ import yahooFinance from "yahoo-finance2"
 
 export async function GET(
 	request: Request,
-	{ params }: { params: { ticker: string } }
+	{ params }: { params: Promise<{ ticker: string }> }
 ) {
-	const ticker = params.ticker
+	const {ticker} = await params
 
 	try {
 		const quoteSummary = await yahooFinance.quoteSummary(ticker, {
@@ -19,13 +19,6 @@ export async function GET(
 			region: "US",
 		});
 
-
-
-		console.log(quoteSummary);
-		console.log("HELLO")
-		console.log(quoteSummary.calendarEvents?.earnings.earningsDate);
-		console.log(quoteSummary.calendarEvents?.earnings.earningsCallDate);
-		console.log(optionSummary)
 
 		const stockDetails = {
 			name: quoteSummary.price?.longName || quoteSummary.price?.shortName || ticker,
