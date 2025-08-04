@@ -7,9 +7,7 @@ import {
 	Tooltip,
 	XAxis,
 	YAxis,
-	ReferenceArea,
 	ReferenceLine,
-	Label,
 } from "recharts"
 import {
 	Card,
@@ -33,6 +31,8 @@ import {
 } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 function PageSpinner() {
 	return (
@@ -50,11 +50,11 @@ function ChartSpinner() {
 	)
 }
 
-const timeframes = ["1D", "5D", "1M", "3M", "6M", "1Y", "5Y", "10Y"]
+const timeframes = ["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "5Y", "10Y", "MAX"]
 const shortTimeframes = ["1D", "5D"]
-const intradayTimeframes = ["1D", "5D"]
 
 export default function SingleStockView({ ticker }: { ticker: string }) {
+	const router = useRouter()
 	const [stock, setStock] = useState<any>(null)
 	const [chartData, setChartData] = useState<any[]>([])
 	const [pageLoading, setPageLoading] = useState(true)
@@ -73,7 +73,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			setError(null)
 			try {
 				const response = await fetch(`/api/stock/${ticker}/details`)
-				if (!response.ok) throw new Error("Failed to fetch stock details")
+				if (!response.ok) throw new Error("Failed to fetch stock details. \n This stock probably doesnt exist")
 				const data = await response.json()
 				setStock(data)
 			} catch (err: any) {
@@ -131,7 +131,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 	}, [chartData])
 
 	const marketIndicators = useMemo(() => {
-		if (!intradayTimeframes.includes(timeframe) || chartData.length === 0) {
+		if (!shortTimeframes.includes(timeframe) || chartData.length === 0) {
 			return null
 		}
 		const indicators: React.ReactNode[] = []
@@ -141,6 +141,8 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			const date = new Date(point.time)
 			const hours = date.getHours()
 			const minutes = date.getMinutes()
+			// add date if timeframe is 5D
+			const dateLabel = date.toLocaleDateString()
 
 			const timeStr = new Date(point.time).toISOString()
 
@@ -180,21 +182,39 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 
 	const formatTick = (tick: string) => {
 		const date = new Date(tick)
-		if (shortTimeframes.includes(timeframe)) {
+		if (timeframe === "1D") {
 			return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+		}
+		else if (timeframe === "5D") {
+			return date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" }) + " " +
+				date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 		}
 		return date.toLocaleDateString()
 	}
 
 	if (pageLoading) return <PageSpinner />
-	if (error) return (
-		<Card className="flex h-96 w-full items-center justify-center bg-red-50 dark:bg-red-900/20">
-			<div className="text-center">
-				<CardTitle className="text-2xl text-red-600 dark:text-red-400">Error</CardTitle>
-				<CardDescription className="text-red-500 dark:text-red-400/80">{error}</CardDescription>
-			</div>
-		</Card>
-	)
+	if (error) {
+		return (
+			<Card className="flex h-96 w-full items-center justify-center bg-red-50 dark:bg-red-900/20">
+				<div className="text-center">
+					<CardTitle className="text-2xl text-red-600 dark:text-red-400">
+						Error
+					</CardTitle>
+					<CardDescription className="text-red-500 dark:text-red-400/80">
+						{error}
+					</CardDescription>
+					{/* 3. Add the button here */}
+					<Button
+						variant="destructive"
+						className="mt-4"
+						onClick={() => router.back()}
+					>
+						Go Back
+					</Button>
+				</div>
+			</Card>
+		)
+	}
 	if (!stock) return null
 
 	const isPositive = stock.change >= 0

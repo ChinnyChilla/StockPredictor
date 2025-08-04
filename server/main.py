@@ -5,12 +5,22 @@ import math
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
-import earnings
 import os
+
+from .routers import earnings
+
+from .routers.market import router as market_router
+from .routers.earnings import router as earnings_router
+from .routers.stock import router as stock_router
 
 load_dotenv()
 
 app = FastAPI()
+
+app.include_router(market_router, prefix="/api")
+app.include_router(earnings_router, prefix="/api")
+app.include_router(stock_router, prefix="/api")
+
 
 def get_db_connection():
 	try:
@@ -36,6 +46,7 @@ async def root():
 async def get_current_price(stock : Annotated[str, Path(title="The ticker to fetch")]):
 	try:
 		ticker = yf.Ticker(stock)
+		print(yf.Ticker(stock).fast_info)
 		return ticker.info['regularMarketPrice']
 	except:
 		raise HTTPException(status_code=404, detail="Current price not found")
@@ -76,7 +87,16 @@ async def post_next_week_earnings():
 
 		if earning['hour'] == '':
 			continue
-
+		
+		try:
+			# only companies over 50 billion market cap
+			if yf.Ticker(earning['ticker']).fast_info['marketCap'] < 10_000_000_000:
+				continue
+		except Exception as e:
+			print("Failed to find market cap data for " + earning['ticker'])
+			print("SKIPPING")
+			continue
+		
 		result = cursor.execute("SELECT * FROM earnings WHERE ticker = '{0}'".format(earning['ticker']))
 		rows = cursor.fetchall()
 		# Row doesnt exist, create it

@@ -19,7 +19,6 @@ export async function GET(
 			region: "US",
 		});
 
-
 		const stockDetails = {
 			name: quoteSummary.price?.longName || quoteSummary.price?.shortName || ticker,
 			price: quoteSummary.price?.regularMarketPrice,

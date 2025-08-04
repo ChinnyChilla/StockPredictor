@@ -21,6 +21,7 @@ const formatQuote = (quote: any, nameOverride?: string) => {
 	}
 }
 
+
 export async function GET() {
 	try {
 		const indexTickers = ["^GSPC", "^DJI", "^IXIC", "^RUT", "^VIX", "^TNX"]
@@ -33,20 +34,14 @@ export async function GET() {
 			"^TNX": "10-Yr Treasury",
 		}
 
-		const [indicesQuotes, trendingResult] = await Promise.all([
+		const [indicesQuotes] = await Promise.all([
 			yahooFinance.quote(indexTickers),
-			yahooFinance.trendingSymbols("US", { count: 6 }),
 		])
 
-		const trendingSymbols = trendingResult.quotes.map(q => q.symbol);
-		const trendingQuotes = await yahooFinance.quote(trendingSymbols);
-
 		const formattedIndices = indicesQuotes.map(q => formatQuote(q, indexNames[q.symbol]))
-		const formattedTrending = trendingQuotes.map(q => formatQuote(q));
 
 		return NextResponse.json({
 			indices: formattedIndices,
-			trending: formattedTrending,
 		})
 	} catch (error) {
 		console.error("Failed to fetch market overview data:", error)

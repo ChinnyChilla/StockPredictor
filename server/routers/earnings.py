@@ -5,14 +5,13 @@ import numpy as np
 from dotenv import load_dotenv
 import finnhub
 import os
+from fastapi import APIRouter
 
 load_dotenv()
 
 finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 
-import os
-import requests
-from datetime import datetime, timedelta
+router = APIRouter()
 
 def get_earnings_calendar():
 	try:
@@ -131,7 +130,6 @@ def build_term_structure(days, ivs):
 
 def get_current_price(ticker):
 	todays_data = ticker.history(period='1d')
-	print(todays_data['Close'])
 	return todays_data['Close'].iloc[0]
 
 def compute_recommendation(ticker):

@@ -61,9 +61,7 @@ const MarketSkeleton = () => (
 
 export default function MarketOverview() {
 	const [marketData, setMarketData] = useState<{
-		indices: MarketItem[],
-		trending: MarketItem[]
-	} | null>(null)
+		indices: MarketItem[]} | null>(null)
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
@@ -93,9 +91,6 @@ export default function MarketOverview() {
 				<>
 					{marketData.indices.map(item => (
 						<MarketCard key={item.symbol} item={item} isIndex={true} />
-					))}
-					{marketData.trending.map(item => (
-						<MarketCard key={item.symbol} item={item} />
 					))}
 				</>
 			)}

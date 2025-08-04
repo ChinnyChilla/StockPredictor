@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
 import MarketOverview from "@/components/market-overview"
-import StockChart from "@/components/stock-chart"
 import MarketNews from "@/components/market-news"
-import Watchlist from "@/components/watchlist"
-import MarketMovers from "@/components/market-movers"
 import MarketEarningsCompanies from "@/components/market-earnings-companies"
+import SearchBar from "@/components/search-bar"
 
 export const metadata: Metadata = {
 	title: "Stock Market Dashboard",
@@ -14,22 +12,19 @@ export const metadata: Metadata = {
 export default function HomePage() {
 	return (
 		<div className="flex flex-col gap-6 p-4 md:p-6">
+			<div className="flex justify-center">
+				<SearchBar />
+			</div>
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 				<MarketOverview />
 			</div>
 			<div className="grid gap-4 md:grid-cols-3">
 				<div className="md:col-span-2">
-					<StockChart />
+					<MarketNews />
 				</div>
 				<div>
 					<MarketEarningsCompanies />
 				</div>
-			</div>
-			{/* right side */}
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-				
-				<MarketNews />
-				<MarketMovers />
 			</div>
 		</div>
 	)
