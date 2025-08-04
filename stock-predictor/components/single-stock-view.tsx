@@ -345,7 +345,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 
 			<div className="lg:col-span-1 space-y-6">
 				<Card className="h-96">
-					<CardHeader><CardTitle>Placeholder Card</CardTitle><CardDescription>You can add content here later.</CardDescription></CardHeader>
+					<CardHeader><CardTitle>Placeholder Card</CardTitle><CardDescription>Big pen pinapple pen</CardDescription></CardHeader>
 					<CardContent></CardContent>
 				</Card>
 			</div>
