@@ -78,8 +78,7 @@ include servers/*;
 ### Installing
 
 #### Running the backend
-1. In a terminal, run `cd server`
-2. Then start the backend by running
+In the root directory, run:
 ```
 uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload
 ```

@@ -13,9 +13,14 @@ from .routers.market import router as market_router
 from .routers.earnings import router as earnings_router
 from .routers.stock import router as stock_router
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+
+
 load_dotenv()
 
 app = FastAPI()
+
 
 app.include_router(market_router, prefix="/api")
 app.include_router(earnings_router, prefix="/api")
@@ -72,6 +77,7 @@ async def get_all_earnings():
 
 @app.post("/api/earnings", status_code=201)
 async def post_next_week_earnings():
+	print("Adding to earnings table")
 	db = get_db_connection()
 
 	if not db.is_connected():
@@ -133,6 +139,7 @@ async def post_next_week_earnings():
 
 @app.delete("/api/earnings")
 async def delete_week_old_earnings():
+	print("Deleting eanrings older than today")
 	db = get_db_connection()
 
 	if not db.is_connected():
@@ -146,12 +153,62 @@ async def delete_week_old_earnings():
 	db.close()
 	return {"message": f'Successfully deleted {0} rows'.format(cursor.rowcount)}
 
-# "INSERT INTO earnings (ticker, earnings_date, avg_volume, iv30_rv30, ts_slope, eps_estimate) VALUES ({ticker},{earnings_date},{avg_vol},{iv30_rv30},{ts_slope},{eps_estimate})".format(
-# 	ticker=earnings['ticker'],
-# 	earnings_date=earnings['date'],
-# 	avg_vol=prediction['avg_volume'],
-# 	iv30_rv30=prediction['iv30_rv30'],
-# 	ts_slope=prediction['ts_slope_0_45'],
-# 	expected_move=prediction['expected_move'],
-# 	eps_estimate=earnings['epsEstimate']
-# )
+
+@app.post("/api/earnings/update")
+async def update_earnings():
+	print("Updating earnings table")
+	db = get_db_connection()
+
+	if not db.is_connected():
+		raise HTTPException(status_code=500, detail="Could not connect to database")
+
+	cursor = db.cursor()
+
+	cursor.execute("SELECT * FROM earnings")
+	columns = [description[0] for description in cursor.description]
+	earnings_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+	update_count = 0
+
+	for earning in earnings_list:
+		ticker = earning['ticker']
+		try:
+			prediction = earnings.compute_recommendation(ticker)
+			if prediction['message'].startswith('Error'):
+				print(f"Error processing {ticker}: {prediction['message']}")
+				continue
+			values = (
+				prediction['expected_move'][:-1],
+				round(prediction['avg_volume'], ndigits=2),
+				round(prediction['iv30_rv30'], ndigits=10),
+				round(prediction['ts_slope_0_45'], ndigits=10),
+				prediction['rating'],
+				ticker
+			)
+			command = "UPDATE earnings SET expected_move = %s, avg_volume = %s, iv30_rv30 = %s, ts_slope = %s, rating = %s WHERE ticker = %s"
+			cursor.execute(command, values)
+			db.commit()
+			update_count += 1
+		except Exception as e:
+			print(f"Error processing ticker {ticker}: {e}")
+			print("Skipping ticker due to error")
+	return {"message": f'Successfully updated {update_count} rows'}
+
+
+
+
+scheduler = BackgroundScheduler(timezone='America/New_York')
+scheduler.add_job(
+	delete_week_old_earnings,
+	trigger=CronTrigger(hour=1, minute=0)
+)
+scheduler.add_job(
+	post_next_week_earnings,
+	trigger=CronTrigger(hour=6, minute=0, day_of_week='mon-fri')
+)
+
+scheduler.add_job(
+	update_earnings,
+	trigger=CronTrigger(hour=13, minute=0, day_of_week='mon-fri')
+)
+scheduler.start()
