@@ -73,7 +73,7 @@ If on Mac:
 include servers/*;
 ```
 5. Run `nginx -t` to make sure everything is OK
-6. Run `sudo nginx -s reload` to save changes
+6. Run `brew services restart nginx` to save changes
 
 ### Installing
 

@@ -11,13 +11,11 @@ interface NewsItem {
 	title: string
 	summary: string
 	link: string
-	providerPublishTime: string // Assuming this is an ISO 8601 date string or timestamp
+	providerPublishTime: string
 	publisher: string
 }
 
-// Helper function to format the time
 function formatTimeAgo(dateInput: string | number) {
-	// Handles both ISO strings and Unix timestamps
 	const date = new Date(dateInput)
 	const now = new Date()
 	const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
@@ -52,8 +50,10 @@ export default function MarketNews() {
 					throw new Error('Failed to fetch market news. Please try again later.')
 				}
 				const data = await response.json()
-				// Assuming the API returns the array of news items directly
-				setNewsItems(data.news || [])
+				const sortedNews = (data.news || []).sort((a: NewsItem, b: NewsItem) => {
+					return new Date(b.providerPublishTime).getTime() - new Date(a.providerPublishTime).getTime()
+				})
+				setNewsItems(sortedNews)
 			} catch (err) {
 				if (err instanceof Error) {
 					setError(err.message)
