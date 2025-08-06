@@ -106,8 +106,29 @@ async def post_next_week_earnings():
 		result = cursor.execute("SELECT * FROM earnings WHERE ticker = '{0}'".format(earning['ticker']))
 		rows = cursor.fetchall()
 		# Row doesnt exist, create it
-		
-		if len(rows) == 0:
+
+		if (len(rows) == 1):
+			try:
+				prediction = earnings.compute_recommendation(earning['ticker'])
+				if prediction['message'].startswith('Error'):
+					print(f"Error processing {earning['ticker']}: {prediction['message']}")
+					continue
+				values = (
+					prediction['expected_move'][:-1],
+					round(prediction['avg_volume'], ndigits=2),
+					round(prediction['iv30_rv30'], ndigits=10),
+					round(prediction['ts_slope_0_45'], ndigits=10),
+					prediction['rating'],
+					earning['ticker']
+				)
+				command = "UPDATE earnings SET expected_move = %s, avg_volume = %s, iv30_rv30 = %s, ts_slope = %s, rating = %s WHERE ticker = %s"
+				cursor.execute(command, values)
+				db.commit()
+				rowCount += 1
+			except Exception as e:
+				print(f"Error processing ticker {earning['ticker']}: {e}")
+				print("Skipping ticker due to error")
+		elif len(rows) == 0:
 			prediction = earnings.compute_recommendation(earning['ticker'])
 			if prediction['message'].startswith('Error'):
 				print("no earnings for {0}".format(earning['ticker']))
@@ -154,49 +175,6 @@ async def delete_week_old_earnings():
 	return {"message": f'Successfully deleted {0} rows'.format(cursor.rowcount)}
 
 
-@app.post("/api/earnings/update")
-async def update_earnings():
-	print("Updating earnings table")
-	db = get_db_connection()
-
-	if not db.is_connected():
-		raise HTTPException(status_code=500, detail="Could not connect to database")
-
-	cursor = db.cursor()
-
-	cursor.execute("SELECT * FROM earnings")
-	columns = [description[0] for description in cursor.description]
-	earnings_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-	update_count = 0
-
-	for earning in earnings_list:
-		ticker = earning['ticker']
-		try:
-			prediction = earnings.compute_recommendation(ticker)
-			if prediction['message'].startswith('Error'):
-				print(f"Error processing {ticker}: {prediction['message']}")
-				continue
-			values = (
-				prediction['expected_move'][:-1],
-				round(prediction['avg_volume'], ndigits=2),
-				round(prediction['iv30_rv30'], ndigits=10),
-				round(prediction['ts_slope_0_45'], ndigits=10),
-				prediction['rating'],
-				ticker
-			)
-			command = "UPDATE earnings SET expected_move = %s, avg_volume = %s, iv30_rv30 = %s, ts_slope = %s, rating = %s WHERE ticker = %s"
-			cursor.execute(command, values)
-			db.commit()
-			update_count += 1
-		except Exception as e:
-			print(f"Error processing ticker {ticker}: {e}")
-			print("Skipping ticker due to error")
-	return {"message": f'Successfully updated {update_count} rows'}
-
-
-
-
 scheduler = BackgroundScheduler(timezone='America/New_York')
 scheduler.add_job(
 	delete_week_old_earnings,
@@ -204,11 +182,7 @@ scheduler.add_job(
 )
 scheduler.add_job(
 	post_next_week_earnings,
-	trigger=CronTrigger(hour=6, minute=0, day_of_week='mon-fri')
-)
-
-scheduler.add_job(
-	update_earnings,
 	trigger=CronTrigger(hour=13, minute=0, day_of_week='mon-fri')
 )
+
 scheduler.start()
