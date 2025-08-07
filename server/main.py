@@ -63,13 +63,47 @@ async def root():
 
 
 @app.get("/api/stocks/{stock}/currentPrice")
-async def get_current_price(stock : Annotated[str, Path(title="The ticker to fetch")]):
+async def get_current_price(stock: Annotated[str, Path(title="The ticker to fetch")]):
 	try:
 		ticker = yf.Ticker(stock)
-		print(yf.Ticker(stock).fast_info)
-		return ticker.info['regularMarketPrice']
-	except:
+		info = ticker.info
+
+		prev_close = info.get("regularMarketPrice")
+		prev_close_percent = round(info.get("regularMarketChangePercent"), ndigits=2)
+
+		if info['postMarketPrice'] is not None:
+			post_price = info.get("postMarketPrice")
+			post_price_percent = round(info.get("postMarketChangePercent"), ndigits=2)
+			
+			return {
+				"post_price": post_price,
+				"post_price_percent": post_price_percent,
+				"last_price": prev_close,
+				"last_price_percent": prev_close_percent,
+				"source": "after-hours"
+			}
+
+		elif info["preMarketPrice"] is not None:
+
+			pre_price = info.get("preMarketPrice")
+			pre_price_percent = round(info.get("preMarketChangePercent"), ndigits=2)
+			return {
+				"pre_price": pre_price,
+				"pre_price_percent": pre_price_percent,
+				"last_price": prev_close,
+				"last_price_percent": prev_close_percent,
+				"source": "before-hours"
+			}
+		else:
+			return {
+				"last_price": prev_close,
+				"last_price_percent": prev_close_percent,
+				"source": "during-hours"
+			}
+
+	except Exception as e:
 		raise HTTPException(status_code=404, detail="Current price not found")
+
 
 @app.get("/api/stocks/{stock}/earnings/prediction/")
 async def get_earnings_prediction(stock: Annotated[str, Path(title="The ticker to fetch prediction about")]):

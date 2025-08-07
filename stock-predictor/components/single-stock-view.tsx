@@ -33,6 +33,7 @@ import { useEffect, useState, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import FlashingSpan from "@/components/ui/flashing-span"
 
 function PageSpinner() {
 	return (
@@ -50,6 +51,24 @@ function ChartSpinner() {
 	)
 }
 
+// Helper to format large numbers into B (billions) or M (millions)
+function formatNumber(num: number): string {
+	if (num === null || num === undefined) return 'N/A';
+	if (num >= 1_000_000_000_000) {
+		return (num / 1_000_000_000_000).toFixed(2) + 'T';
+	}
+	if (num >= 1_000_000_000) {
+		return (num / 1_000_000_000).toFixed(2) + 'B';
+	}
+	if (num >= 1_000_000) {
+		return (num / 1_000_000).toFixed(2) + 'M';
+	}
+	if (num >= 1_000) {
+		return (num / 1000).toFixed(2) + 'K';
+	}
+	return num.toString();
+}
+
 const timeframes = ["1D", "5D", "1M", "3M", "6M", "YTD", "1Y", "5Y", "10Y", "MAX"]
 const shortTimeframes = ["1D", "5D"]
 
@@ -62,6 +81,36 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 	const [error, setError] = useState<string | null>(null)
 	const [timeframe, setTimeframe] = useState("1D")
 	const [chartLoadingKey, setChartLoadingKey] = useState(0)
+	const [livePriceData, setLivePriceData] = useState<any>(null)
+
+	useEffect(() => {
+		if (!ticker) return
+
+		const interval = setInterval(async () => {
+			try {
+				const response = await fetch(`/api/stocks/${ticker}/currentPrice`)
+				if (!response.ok) throw new Error("Failed to fetch current price")
+				const data = await response.json()
+				setLivePriceData(data)
+			} catch (err) {
+				console.error("Price update error", err)
+			}
+		}, 5000)
+
+			// Initial fetch
+			; (async () => {
+				try {
+					const response = await fetch(`/api/stocks/${ticker}/currentPrice`)
+					if (!response.ok) throw new Error("Failed to fetch current price")
+					const data = await response.json()
+					setLivePriceData(data)
+				} catch (err) {
+					console.error("Initial price fetch failed", err)
+				}
+			})()
+
+		return () => clearInterval(interval)
+	}, [ticker])
 
 	useEffect(() => {
 		setChartLoadingKey(prev => prev + 1)
@@ -230,11 +279,52 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 								<CardDescription className="text-lg">{ticker.toUpperCase()}</CardDescription>
 							</div>
 							<div className="text-right">
-								<div className="text-3xl font-bold">${stock.price?.toFixed(2)}</div>
-								<div className={`flex items-center justify-end text-lg ${isPositive ? "text-green-500" : "text-red-500"}`}>
-									{isPositive ? <ArrowUpIcon className="mr-1 h-5 w-5" /> : <ArrowDownIcon className="mr-1 h-5 w-5" />}
-									{stock.change?.toFixed(2)} ({stock.percentChange?.toFixed(2)}%)
-								</div>
+								{livePriceData ? (
+									<div className="space-y-1">
+										{/* Regular Market Price (Always show) */}
+										<div>
+											<div className="text-muted-foreground text-sm">Regular Market</div>
+											<div className="flex items-center justify-end">
+												<FlashingSpan value={livePriceData.last_price} className="text-2xl font-bold" />
+												<div className={`ml-2 flex items-center text-sm ${livePriceData.last_price_percent >= 0 ? "text-green-500" : "text-red-500"}`}>
+													{livePriceData.last_price_percent >= 0 ? <ArrowUpIcon className="mr-1 h-4 w-4" /> : <ArrowDownIcon className="mr-1 h-4 w-4" />}
+													{livePriceData.last_price_percent.toFixed(2)}%
+												</div>
+											</div>
+										</div>
+
+										{/* After-Hours */}
+										{livePriceData.source === "after-hours" && (
+											<div>
+												<div className="text-muted-foreground text-sm">After Hours</div>
+												<div className="flex items-center justify-end">
+													<FlashingSpan value={livePriceData.post_price} className="text-2xl font-bold" />
+													<div className={`ml-2 flex items-center text-sm ${livePriceData.post_price_percent >= 0 ? "text-green-500" : "text-red-500"}`}>
+														{livePriceData.post_price_percent >= 0 ? <ArrowUpIcon className="mr-1 h-4 w-4" /> : <ArrowDownIcon className="mr-1 h-4 w-4" />}
+														{livePriceData.post_price_percent.toFixed(2)}%
+													</div>
+												</div>
+											</div>
+										)}
+
+										{/* Pre-Market */}
+										{livePriceData.source === "before-hours" && (
+											<div>
+												<div className="text-muted-foreground text-sm">Pre-Market</div>
+												<div className="flex items-center justify-end">
+													<FlashingSpan value={livePriceData.pre_price} className="text-2xl font-bold" />
+													<div className={`ml-2 flex items-center text-sm ${livePriceData.pre_price_percent >= 0 ? "text-green-500" : "text-red-500"}`}>
+														{livePriceData.pre_price_percent >= 0 ? <ArrowUpIcon className="mr-1 h-4 w-4" /> : <ArrowDownIcon className="mr-1 h-4 w-4" />}
+														{livePriceData.pre_price_percent.toFixed(2)}%
+													</div>
+												</div>
+											</div>
+										)}
+									</div>
+								) : (
+									// fallback while loading
+									<div className="text-2xl font-bold">--</div>
+								)}
 							</div>
 						</div>
 					</CardHeader>
@@ -324,7 +414,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 						<Card><CardContent className="pt-6">
 							<Table>
 								<TableBody>
-									<TableRow><TableCell className="font-medium">Market Cap</TableCell><TableCell className="text-right">{stock.marketCap?.toLocaleString() || "N/A"}</TableCell></TableRow>
+									<TableRow><TableCell className="font-medium">Market Cap</TableCell><TableCell className="text-right">{formatNumber(stock.marketCap) || "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">Trailing P/E Ratio</TableCell><TableCell className="text-right">{stock.trailingPERatio?.toFixed(2) || "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">Forward P/E Ratio</TableCell><TableCell className="text-right">{stock.forwardPERatio?.toFixed(2) || "N/A"}</TableCell></TableRow>
 									<TableRow><TableCell className="font-medium">Dividend Yield</TableCell><TableCell className="text-right">{stock.dividendYield ? `${(stock.dividendYield * 100).toFixed(2)}%` : "N/A"}</TableCell></TableRow>
