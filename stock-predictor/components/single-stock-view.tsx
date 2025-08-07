@@ -152,18 +152,21 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 	}, [ticker, timeframe])
 
 	useEffect(() => {
-		const clip = document.getElementById("clip-rect")
-		if (clip) {
-			clip.setAttribute("width", "0%")
-			clip.animate(
-				[{ width: "0%" }, { width: "100%" }],
-				{
-					duration: 1200,
-					easing: "ease-out",
-					fill: "forwards",
-				}
-			)
-		}
+		setTimeout(() => {
+			const clip = document.getElementById("clip-rect")
+			if (clip) {
+				clip.setAttribute("width", "0%")
+				clip.animate(
+					[{ width: "0%" }, { width: "100%" }],
+					{
+						duration: 1200,
+						easing: "ease-out",
+						fill: "forwards",
+					}
+				)
+			}
+		}, 100)
+		
 	}, [chartData])
 
 	const chartPerformance = useMemo(() => {
@@ -190,8 +193,6 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			const date = new Date(point.time)
 			const hours = date.getHours()
 			const minutes = date.getMinutes()
-			// add date if timeframe is 5D
-			const dateLabel = date.toLocaleDateString()
 
 			const timeStr = new Date(point.time).toISOString()
 
@@ -281,7 +282,6 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 							<div className="text-right">
 								{livePriceData ? (
 									<div className="space-y-1">
-										{/* Regular Market Price (Always show) */}
 										<div>
 											<div className="text-muted-foreground text-sm">Regular Market</div>
 											<div className="flex items-center justify-end">
@@ -293,7 +293,6 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 											</div>
 										</div>
 
-										{/* After-Hours */}
 										{livePriceData.source === "after-hours" && (
 											<div>
 												<div className="text-muted-foreground text-sm">After Hours</div>
@@ -307,7 +306,6 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 											</div>
 										)}
 
-										{/* Pre-Market */}
 										{livePriceData.source === "before-hours" && (
 											<div>
 												<div className="text-muted-foreground text-sm">Pre-Market</div>
@@ -322,7 +320,6 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 										)}
 									</div>
 								) : (
-									// fallback while loading
 									<div className="text-2xl font-bold">--</div>
 								)}
 							</div>
