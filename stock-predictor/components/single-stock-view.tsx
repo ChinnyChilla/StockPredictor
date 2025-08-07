@@ -152,20 +152,18 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 	}, [ticker, timeframe])
 
 	useEffect(() => {
-		setTimeout(() => {
-			const clip = document.getElementById("clip-rect")
-			if (clip) {
-				clip.setAttribute("width", "0%")
-				clip.animate(
-					[{ width: "0%" }, { width: "100%" }],
-					{
-						duration: 1200,
-						easing: "ease-out",
-						fill: "forwards",
-					}
-				)
-			}
-		}, 100)
+		const clip = document.getElementById("clip-rect")
+		if (clip) {
+			clip.setAttribute("width", "0%")
+			clip.animate(
+				[{ width: "0%" }, { width: "100%" }],
+				{
+					duration: 1200,
+					easing: "ease-out",
+					fill: "forwards",
+				}
+			)
+		}
 		
 	}, [chartData])
 
@@ -350,9 +348,9 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 									margin={{ top: 5, right: 20, left: -10, bottom: 20 }}
 								>
 									<defs>
-										<clipPath id="reveal-clip">
+										{/* <clipPath id="reveal-clip">
 											<rect id="clip-rect" x="0" y="0" width="0%" height="100%" />
-										</clipPath>
+										</clipPath> */}
 										<linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
 											<stop offset="5%" stopColor={isPositive ? "#10B981" : "#EF4444"} stopOpacity={0.3} />
 											<stop offset="95%" stopColor={isPositive ? "#10B981" : "#EF4444"} stopOpacity={0} />
