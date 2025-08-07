@@ -15,17 +15,32 @@ from .routers.stock import router as stock_router
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 load_dotenv()
 
-app = FastAPI()
+async def lifespan(app: FastAPI):
+	scheduler = AsyncIOScheduler(timezone='America/New_York', standalone=True)
+	scheduler.add_job(
+		delete_week_old_earnings,
+		trigger="cron",
+		hour=1, minute=0
+	)
+	scheduler.add_job(
+		post_next_week_earnings,
+		trigger="cron",
+		hour=13, minute=0, day_of_week='mon-fri'
+	)
+	scheduler.start()
+	yield
+	scheduler.shutdown()
 
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(market_router, prefix="/api")
 app.include_router(earnings_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
-
 
 def get_db_connection():
 	try:
@@ -173,16 +188,3 @@ async def delete_week_old_earnings():
 
 	db.close()
 	return {"message": f'Successfully deleted {0} rows'.format(cursor.rowcount)}
-
-
-scheduler = BackgroundScheduler(timezone='America/New_York')
-scheduler.add_job(
-	delete_week_old_earnings,
-	trigger=CronTrigger(hour=1, minute=0)
-)
-scheduler.add_job(
-	post_next_week_earnings,
-	trigger=CronTrigger(hour=13, minute=0, day_of_week='mon-fri')
-)
-
-scheduler.start()
