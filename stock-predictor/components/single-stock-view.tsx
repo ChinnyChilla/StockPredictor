@@ -281,9 +281,8 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 								{livePriceData ? (
 									<div className="space-y-1">
 										<div>
-											<div className="text-muted-foreground text-sm">Regular Market</div>
 											<div className="flex items-center justify-end">
-												<FlashingSpan value={livePriceData.last_price} className="text-2xl font-bold" />
+												<FlashingSpan value={livePriceData.last_price} className={`${livePriceData.source == "during-hours" ? "text-3xl" : "text-2xl"} font-bold`} />
 												<div className={`ml-2 flex items-center text-sm ${livePriceData.last_price_percent >= 0 ? "text-green-500" : "text-red-500"}`}>
 													{livePriceData.last_price_percent >= 0 ? <ArrowUpIcon className="mr-1 h-4 w-4" /> : <ArrowDownIcon className="mr-1 h-4 w-4" />}
 													{livePriceData.last_price_percent.toFixed(2)}%

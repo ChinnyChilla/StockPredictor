@@ -71,7 +71,7 @@ async def get_current_price(stock: Annotated[str, Path(title="The ticker to fetc
 		prev_close = info.get("regularMarketPrice")
 		prev_close_percent = round(info.get("regularMarketChangePercent"), ndigits=2)
 
-		if info['postMarketPrice'] is not None:
+		if 'postMarketPrice' in info:
 			post_price = info.get("postMarketPrice")
 			post_price_percent = round(info.get("postMarketChangePercent"), ndigits=2)
 			
@@ -83,7 +83,7 @@ async def get_current_price(stock: Annotated[str, Path(title="The ticker to fetc
 				"source": "after-hours"
 			}
 
-		elif info["preMarketPrice"] is not None:
+		elif "preMarketPrice" in info:
 
 			pre_price = info.get("preMarketPrice")
 			pre_price_percent = round(info.get("preMarketChangePercent"), ndigits=2)
@@ -102,8 +102,9 @@ async def get_current_price(stock: Annotated[str, Path(title="The ticker to fetc
 			}
 
 	except Exception as e:
+		print(e)
 		raise HTTPException(status_code=404, detail="Current price not found")
-
+		
 
 @app.get("/api/stocks/{stock}/earnings/prediction/")
 async def get_earnings_prediction(stock: Annotated[str, Path(title="The ticker to fetch prediction about")]):
