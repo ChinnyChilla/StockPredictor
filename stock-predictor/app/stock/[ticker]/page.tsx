@@ -1,4 +1,4 @@
-import SingleStockView from "@/components/single-stock-view"
+import SingleStockView from "@/app/pages/single-stock-view"
 import type { Metadata } from "next"
 
 

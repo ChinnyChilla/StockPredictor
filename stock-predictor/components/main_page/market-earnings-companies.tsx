@@ -16,7 +16,7 @@ import {
 	TableRow,
 } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { CalendarDays, Forward, Hourglass, Info, Sun, Sunset } from "lucide-react"
+import { CalendarDays, Forward, Hourglass, Info, Sunrise, Sunset } from "lucide-react"
 import { text } from "stream/consumers"
 
 interface Earning {
@@ -80,7 +80,7 @@ const getGroupTitle = (dateStr: string, hour: Earning["earnings_timing"]): { tit
 	const dateLabel = isToday ? "Today" : isTomorrow ? "Tomorrow" : earningDate.toLocaleDateString("en-US", { weekday: 'long', timeZone: 'UTC' })
 
 	switch (hour) {
-		case "bmo": return { title: `${dateLabel} - Pre-Market`, icon: <Sun size={14} />, order: 1 }
+		case "bmo": return { title: `${dateLabel} - Pre-Market`, icon: <Sunrise size={14} />, order: 1 }
 		case "dmh": return { title: `${dateLabel} - During Hours`, icon: <Hourglass size={14} />, order: 2 }
 		case "amc": return { title: `${dateLabel} - After Close`, icon: <Sunset size={14} />, order: 3 }
 		default: return { title: `${dateLabel} - Unknown Time`, icon: <CalendarDays size={14} />, order: 4 }

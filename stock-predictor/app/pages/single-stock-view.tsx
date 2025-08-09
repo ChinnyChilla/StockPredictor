@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import FlashingSpan from "@/components/ui/flashing-span"
+import OptionsCard from "@/components/single_stock/options_card"
 
 function PageSpinner() {
 	return (
@@ -425,6 +426,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 						</Card>
 					</TabsContent>
 				</Tabs>
+				<OptionsCard ticker={ticker} />
 			</div>
 
 			<div className="lg:col-span-1 space-y-6">

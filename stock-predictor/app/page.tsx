@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import MarketOverview from "@/components/market-overview"
-import MarketNews from "@/components/market-news"
-import MarketEarningsCompanies from "@/components/market-earnings-companies"
-import SearchBar from "@/components/search-bar"
+import MarketOverview from "@/components/main_page/market-overview"
+import MarketNews from "@/components/main_page/market-news"
+import MarketEarningsCompanies from "@/components/main_page/market-earnings-companies"
+import SearchBar from "@/components/main_page/search-bar"
 
 export const metadata: Metadata = {
 	title: "Stock Market Dashboard",
