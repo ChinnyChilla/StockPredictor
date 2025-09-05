@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CalendarDays, Forward, Hourglass, Info, Sunrise, Sunset } from "lucide-react"
-import { text } from "stream/consumers"
-import { read } from "fs"
 
 interface Earning {
 	ticker: string
@@ -85,7 +83,7 @@ const getGroupTitle = (dateStr: string, hour: Earning["earnings_timing"]): { tit
 		case "dmh": return { title: `${dateLabel} - During Hours`, icon: <Hourglass size={14} />, order: 2 }
 		case "amc": return { title: `${dateLabel} - After Close`, icon: <Sunset size={14} />, order: 3 }
 		default: return { title: `${dateLabel} - Unknown Time`, icon: <CalendarDays size={14} />, order: 4 }
-	}1500000
+	};
 }
 
 const getRatingColor = (rating: number) => {
@@ -97,7 +95,7 @@ const getRatingColor = (rating: number) => {
 const getRatingName = (rating: number) => {
 	if (rating === -1) return "AVOID";
 	if (rating === 0) return "MAYBE";
-	if (rating === 1) return "REC.";
+	if (rating === 1) return "RECCO";
 }
 const getVolColor = (amt: number) => {
 	if (amt >= 1500000) return "text-green-500"
