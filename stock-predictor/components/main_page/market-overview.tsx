@@ -15,10 +15,9 @@ interface MarketItem {
 	isPositive: boolean
 }
 
-// A reusable card component for displaying each item
 const MarketCard = ({ item, isIndex = false }: { item: MarketItem, isIndex?: boolean }) => (
 	<Card>
-		<Link href={`/stock/${item.symbol.replace('^', '')}`}>
+		<Link href={`/stock/${item.symbol}`}>
 			<CardHeader className="pb-2">
 				<CardDescription className="flex items-center gap-2">
 					{isIndex ? <BarChart className="h-4 w-4 text-muted-foreground" /> : <LineChart className="h-4 w-4 text-muted-foreground" />}
@@ -42,7 +41,6 @@ const MarketCard = ({ item, isIndex = false }: { item: MarketItem, isIndex?: boo
 	</Card>
 )
 
-// Skeleton loader for when the data is being fetched
 const MarketSkeleton = () => (
 	<>
 		{Array.from({ length: 12 }).map((_, i) => (
