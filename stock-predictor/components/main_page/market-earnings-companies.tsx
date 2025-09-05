@@ -18,6 +18,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CalendarDays, Forward, Hourglass, Info, Sunrise, Sunset } from "lucide-react"
 import { text } from "stream/consumers"
+import { read } from "fs"
 
 interface Earning {
 	ticker: string
@@ -93,6 +94,11 @@ const getRatingColor = (rating: number) => {
 	return "text-red-500"
 }
 
+const getRatingName = (rating: number) => {
+	if (rating === -1) return "AVOID";
+	if (rating === 0) return "CONSIDER";
+	if (rating === 1) return "RECCOMEND";
+}
 const getVolColor = (amt: number) => {
 	if (amt >= 1500000) return "text-green-500"
 	return "text-red-500"
@@ -159,7 +165,7 @@ export default function MarketEarningsCompanies() {
 						<CardTitle>Upcoming Earnings</CardTitle>
 					</div>
 					<CardDescription>
-						Key earnings announcements for the next 7 days.
+						Earnings accouncements and reccomendations for trading options.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="pr-0 pl-2 flex-grow overflow-hidden">
@@ -188,7 +194,7 @@ export default function MarketEarningsCompanies() {
 															<div>{earning.expected_move?.toFixed(2) ?? 'N/A'}%</div>
 														</TableCell>
 														<TableCell className={`py-2 px-2 text-center font-semibold ${getRatingColor(earning.rating)} w-[40px]`}>
-															{earning.rating?.toFixed(1)}
+															{getRatingName(earning.rating)}
 														</TableCell>
 														<TableCell className="py-2 pl-1 pr-2 w-[30px] text-right">
 															<Tooltip>
