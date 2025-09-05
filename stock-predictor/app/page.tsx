@@ -53,17 +53,11 @@ const projects = [
 		skills: ["Next.js", "TypeScript", "Tailwind CSS", "React", "Node.js"],
 	},
 	{
-		title: "Project Alpha",
-		description: "An innovative web application that solves a complex industry problem using modern technologies.",
-		link: "/projects/alpha",
-		skills: ["React", "Node.js", "GraphQL", "PostgreSQL"],
-	},
-	{
-		title: "Project Beta",
-		description: "A mobile-first social networking platform designed to connect like-minded individuals.",
-		link: "/projects/beta",
-		skills: ["React Native", "Firebase", "Git"],
-	},
+		title: "Foodi",
+		description: "Take a picture of your food and get nutritional information about it",
+		link: "/projects/foodi",
+		skills: [],
+	}
 ]
 
 export default function HomePage() {

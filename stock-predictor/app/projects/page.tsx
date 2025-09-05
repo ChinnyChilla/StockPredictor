@@ -17,7 +17,7 @@ const allProjects = [
 		title: "Foodi",
 		description: "Take a picture of your food and get nutritional information about it",
 		link: "/projects/foodi",
-		skills: ["React", "Node.js", "GraphQL", "PostgreSQL"],
+		skills: [],
 	}
 ]
 
