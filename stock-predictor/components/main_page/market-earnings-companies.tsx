@@ -96,8 +96,8 @@ const getRatingColor = (rating: number) => {
 
 const getRatingName = (rating: number) => {
 	if (rating === -1) return "AVOID";
-	if (rating === 0) return "CONSIDER";
-	if (rating === 1) return "RECCOMEND";
+	if (rating === 0) return "MAYBE";
+	if (rating === 1) return "REC.";
 }
 const getVolColor = (amt: number) => {
 	if (amt >= 1500000) return "text-green-500"
