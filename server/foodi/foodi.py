@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import json
 from typing import Optional, Dict, Any
 import os
+import requests
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -42,42 +43,63 @@ class_names = [
 ]
 
 def get_nutrient_info(prediction: str) -> Optional[Dict[str, Any]]:
-    filename = f"{prediction.replace(' ', '_')}.json"
-    file_path = os.path.join("data", "foodi", "nutrients", filename)
+	filename = f"{prediction.replace(' ', '_')}.json"
+	file_path = os.path.join("data", "foodi", "nutrients", filename)
 
-    if not os.path.exists(file_path):
-        print(f"Error: Nutrient file not found at {file_path}")
-        return None
+	if not os.path.exists(file_path):
+		API_KEY = os.getenv("FOODI_API_KEY")
+		APP_ID = os.getenv("FOODI_APP_ID")
+		
+		headers = {
+			"x-app-id": APP_ID,
+			"x-app-key": API_KEY,
+			"Content-Type": "application/json"
+		}
+		body = {
+			"query": prediction,
+		}
+		try:
+			response = requests.post("https://trackapi.nutritionix.com/v2/natural/nutrients", headers=headers, json=body)
+			response.raise_for_status()
+		except Exception as e:
+			print("Error getting API response:", e)
+			return None
+		
+		data = response.json()
+		
+		os.makedirs(os.path.dirname(file_path), exist_ok=True)
+		with open(file_path, 'w') as f:
+			json.dump(data, f, indent=4)
 
-    try:
-        with open(file_path, 'r') as f:
-            data = json.load(f)
+	try:
+		with open(file_path, 'r') as f:
+			data = json.load(f)
 
-        food_details = data['foods'][0]
+		food_details = data['foods'][0]
 
-        key_map = {
-            "food_name": "food_name",
-            "serving_qty": "serving_qty",
-            "serving_unit": "serving_unit",
-            "calories": "nf_calories",
-            "total_fat": "nf_total_fat",
-            "cholesterol": "nf_cholesterol",
-            "protein": "nf_protein",
-            "sodium": "nf_sodium",
-            "total_carbohydrate": "nf_total_carbohydrate",
-            "sugars": "nf_sugars",
-        }
+		key_map = {
+			"food_name": "food_name",
+			"serving_qty": "serving_qty",
+			"serving_unit": "serving_unit",
+			"calories": "nf_calories",
+			"total_fat": "nf_total_fat",
+			"cholesterol": "nf_cholesterol",
+			"protein": "nf_protein",
+			"sodium": "nf_sodium",
+			"total_carbohydrate": "nf_total_carbohydrate",
+			"sugars": "nf_sugars",
+		}
 
-        nutrient_info = {}
-        for friendly_name, source_name in key_map.items():
-            if source_name in food_details and food_details[source_name] is not None:
-                nutrient_info[friendly_name] = food_details[source_name]
-        
-        return nutrient_info
+		nutrient_info = {}
+		for friendly_name, source_name in key_map.items():
+			if source_name in food_details and food_details[source_name] is not None:
+				nutrient_info[friendly_name] = food_details[source_name]
+		
+		return nutrient_info
 
-    except (json.JSONDecodeError, KeyError, IndexError) as e:
-        print(f"An error occurred while processing {file_path}: {e}")
-        return None
+	except (json.JSONDecodeError, KeyError, IndexError) as e:
+		print(f"An error occurred while processing {file_path}: {e}")
+		return None
 
 	
 
