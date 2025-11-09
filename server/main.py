@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 from tensorflow.keras.models import load_model
 import os
 
-from .routers import earnings
+from routers import earnings
 
-from .routers.market import router as market_router
-from .routers.earnings import router as earnings_router
-from .routers.stock import router as stock_router
-from .foodi.foodi import router as foodi_router
+from routers.market import router as market_router
+from routers.earnings import router as earnings_router
+from routers.stock import router as stock_router
+from foodi.foodi import router as foodi_router
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
