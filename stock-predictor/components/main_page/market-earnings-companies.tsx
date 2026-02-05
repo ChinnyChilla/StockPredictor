@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { CalendarDays, Forward, Hourglass, Info, Sunrise, Sunset } from "lucide-react"
+import { getApiUrl } from "@/lib/api_config"
 
 interface Earning {
 	ticker: string
@@ -121,7 +122,7 @@ export default function MarketEarningsCompanies() {
 			setLoading(true)
 			setError(null)
 			try {
-				const response = await fetch("/api/earnings")
+				const response = await fetch(getApiUrl("/api/earnings"))
 				if (!response.ok) throw new Error("Failed to load earnings data.")
 				const data = await response.json()
 				setEarnings(data)

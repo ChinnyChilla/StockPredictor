@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowDownIcon, ArrowUpIcon, BarChart, LineChart } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getApiUrl } from "@/lib/api_config"
 
 interface MarketItem {
 	name: string
@@ -66,7 +67,7 @@ export default function MarketOverview() {
 		async function fetchMarketData() {
 			setLoading(true)
 			try {
-				const response = await fetch("/api/market/overview")
+				const response = await fetch(getApiUrl("/api/market/overview"))
 				if (!response.ok) {
 					throw new Error("Failed to fetch market data")
 				}

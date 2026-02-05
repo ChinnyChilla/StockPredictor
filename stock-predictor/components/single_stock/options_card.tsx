@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@/components/ui/skeleton"
 import FlashingSpan from "@/components/ui/flashing-span" // Make sure this path is correct
 import { cn } from "@/lib/utils"
+import { getApiUrl } from "@/lib/api_config"
 
 interface Option {
 	contractSymbol: string
@@ -76,7 +77,7 @@ export default function OptionsCard({ ticker }: { ticker: string }) {
 		async function fetchExpirations() {
 			setLoadingExpirations(true)
 			try {
-				const response = await fetch(`/api/stock/${ticker}/options/allExpirationDates`)
+				const response = await fetch(getApiUrl(`/api/stock/${ticker}/options/allExpirationDates`))
 				if (!response.ok) throw new Error("Failed to load expiration dates.")
 				const data = await response.json()
 				if (Array.isArray(data) && data.length > 0) {
@@ -106,7 +107,7 @@ export default function OptionsCard({ ticker }: { ticker: string }) {
 			setError(null)
 
 			try {
-				const response = await fetch(`/api/stock/${ticker}/options?expiration=${selectedExpiration}`)
+				const response = await fetch(getApiUrl(`/api/stock/${ticker}/options?expiration=${selectedExpiration}`))
 				if (!response.ok) throw new Error("Failed to load options chain.")
 				const data = await response.json()
 				setOptionsChain(data)

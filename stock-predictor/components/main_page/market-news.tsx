@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
+import { getApiUrl } from "@/lib/api_config"
 
 interface NewsItem {
 	title: string
@@ -44,7 +45,7 @@ export default function MarketNews() {
 				setLoading(true)
 				setError(null)
 
-				const response = await fetch('/api/market/news')
+				const response = await fetch(getApiUrl("/api/market/news"))
 				if (!response.ok) {
 					throw new Error('Failed to fetch market news. Please try again later.')
 				}
