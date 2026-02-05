@@ -7,6 +7,5 @@ scipy
 yfinance
 mysql-connector-python
 apscheduler
-tensorflow==2.13.0
 uvicorn
-Pillow
+gunicorn

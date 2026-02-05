@@ -5,7 +5,7 @@ import math
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
-from tensorflow.keras.models import load_model
+# from tensorflow.keras.models import load_model
 import os
 
 from routers import earnings
@@ -13,7 +13,7 @@ from routers import earnings
 from routers.market import router as market_router
 from routers.earnings import router as earnings_router
 from routers.stock import router as stock_router
-from foodi.foodi import router as foodi_router
+# from foodi.foodi import router as foodi_router
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -22,8 +22,8 @@ load_dotenv()
 
 async def lifespan(app: FastAPI):
 
-	model = load_model('./foodi/foodi_model.h5')
-	app.state.model = model
+	# model = load_model('./foodi/foodi_model.h5')
+	# app.state.model = model
 
 	scheduler = AsyncIOScheduler(timezone='America/New_York', standalone=True)
 	scheduler.add_job(
@@ -45,7 +45,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(market_router, prefix="/api")
 app.include_router(earnings_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
-app.include_router(foodi_router, prefix="/api")
+# app.include_router(foodi_router, prefix="/api")
 
 def get_db_connection():
 	try:
