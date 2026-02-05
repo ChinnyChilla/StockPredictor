@@ -32,3 +32,6 @@
 #     image_array = image_array / 255.0  # Normalize to [0,1]
 #     image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
 #     return image_array
+
+
+#trtingdsfsd
