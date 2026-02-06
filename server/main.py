@@ -59,7 +59,7 @@ def get_db_connection():
 		session = mysql.connector.connect(
 			user=os.getenv("DATABASE_USERNAME"),
 			password=os.getenv("DATABASE_PASSWORD"),
-			host='db.chinny.net',
+			host=os.getenv("DATABASE_HOST"),
 			database=os.getenv("DATABASE_BASE"),
 			port=3306
 		)
