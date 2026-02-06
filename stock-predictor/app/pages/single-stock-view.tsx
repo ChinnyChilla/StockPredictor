@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import FlashingSpan from "@/components/ui/flashing-span"
 import OptionsCard from "@/components/single_stock/options_card"
+import { getApiUrl } from "@/lib/api_config"
 
 function PageSpinner() {
 	return (
@@ -89,7 +90,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 
 		const interval = setInterval(async () => {
 			try {
-				const response = await fetch(`/api/stocks/${ticker}/currentPrice`)
+				const response = await fetch(getApiUrl(`/api/stocks/${ticker}/currentPrice`))
 				if (!response.ok) throw new Error("Failed to fetch current price")
 				const data = await response.json()
 				setLivePriceData(data)
@@ -101,7 +102,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			// Initial fetch
 			; (async () => {
 				try {
-					const response = await fetch(`/api/stocks/${ticker}/currentPrice`)
+					const response = await fetch(getApiUrl(`/api/stocks/${ticker}/currentPrice`))
 					if (!response.ok) throw new Error("Failed to fetch current price")
 					const data = await response.json()
 					setLivePriceData(data)
@@ -122,7 +123,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			setPageLoading(true)
 			setError(null)
 			try {
-				const response = await fetch(`/api/stock/${ticker}/details`)
+				const response = await fetch(getApiUrl(`/api/stock/${ticker}/details`))
 				if (!response.ok) throw new Error("Failed to fetch stock details. \n This stock probably doesnt exist")
 				const data = await response.json()
 				setStock(data)
@@ -139,7 +140,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 		async function fetchChartData() {
 			setChartLoading(true)
 			try {
-				const response = await fetch(`/api/stock/${ticker}/chart?range=${timeframe}`)
+				const response = await fetch(getApiUrl(`/api/stock/${ticker}/chart?range=${timeframe}`))
 				if (!response.ok) throw new Error("Failed to load chart data.")
 				const data = await response.json()
 				setChartData(data.chartData)
