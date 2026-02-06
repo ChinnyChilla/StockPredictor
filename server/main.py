@@ -16,6 +16,7 @@ from routers.stock import router as stock_router
 # from foodi.foodi import router as foodi_router
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from fastapi.middleware.cors import CORSMiddleware
 
 
 load_dotenv()
@@ -46,6 +47,12 @@ app.include_router(market_router, prefix="/api")
 app.include_router(earnings_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
 # app.include_router(foodi_router, prefix="/api")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://chinny.net"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db_connection():
 	try:
