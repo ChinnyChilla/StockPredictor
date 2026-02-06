@@ -61,7 +61,7 @@ def get_db_connection():
 			password=os.getenv("DATABASE_PASSWORD"),
 			host=os.getenv("DATABASE_HOST"),
 			database=os.getenv("DATABASE_BASE"),
-			port=3306
+			port=os.getenv("DATABASE_PORT")
 		)
 		return session
 	except Error as e:
