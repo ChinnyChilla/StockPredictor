@@ -122,7 +122,7 @@ async def get_earnings_prediction(stock: Annotated[str, Path(title="The ticker t
 async def get_all_earnings():
 	db = get_db_connection()
 
-	if not db.is_connected():
+	if db.closed != 0:
 		raise HTTPException(status_code=500, detail="Could not connect to database")
 	
 	cursor = db.cursor()
@@ -138,7 +138,7 @@ async def post_next_week_earnings():
 	print("Adding to earnings table")
 	db = get_db_connection()
 
-	if not db.is_connected():
+	if db.closed != 0:
 		raise HTTPException(status_code=500, detail="Could not connect to database")
 	
 	cursor = db.cursor()
@@ -221,12 +221,12 @@ async def delete_week_old_earnings():
 	print("Deleting eanrings older than today")
 	db = get_db_connection()
 
-	if not db.is_connected():
+	if db.closed != 0:
 		raise HTTPException(status_code=500, detail="Could not connect to database")
 
 	cursor = db.cursor()
 
-	cursor.execute("DELETE FROM earnings WHERE earnings_date < CURDATE();")
+	cursor.execute("DELETE FROM earnings WHERE earnings_date < CURRENT_DATE;")
 	db.commit()
 
 	db.close()
