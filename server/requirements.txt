@@ -1,11 +1,10 @@
 fastapi
 finnhub_python
-mysql_connector_repackaged
 numpy
 python-dotenv
 scipy
 yfinance
-mysql-connector-python
 apscheduler
 uvicorn
 gunicorn
+psycopg2-binary

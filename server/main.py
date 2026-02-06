@@ -2,8 +2,7 @@ from typing import Annotated
 from fastapi import FastAPI, Path, HTTPException
 import yfinance as yf
 import math
-import mysql.connector
-from mysql.connector import Error
+import psycopg2
 from dotenv import load_dotenv
 # from tensorflow.keras.models import load_model
 import os
@@ -56,24 +55,14 @@ app.add_middleware(
 
 def get_db_connection():
     try:
-        # Get the full internal URL from Render environment variables
-        db_url = os.getenv("INTERNAL_DATABASE_URL") 
+        db_url = os.getenv("INTERNAL_DATABASE_URL")
         
-        # Parse the URL into components
-        url = urlparse(db_url)
+        session = psycopg2.connect(db_url)
         
-        session = mysql.connector.connect(
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port or 3306, # Default to 3306 if port is missing
-            database=url.path[1:], # Remove the leading '/' from the path
-            ssl_disabled=False     # Render often requires SSL; this ensures it stays on
-        )
         return session
     except Exception as e:
         print(f"Database Connection Error: {e}")
-        raise HTTPException(status_code=500, detail="Could not connect to database")
+        raise HTTPException(status_code=500, detail="Could not connect to Postgres database")
 	
 
 @app.get("/")
