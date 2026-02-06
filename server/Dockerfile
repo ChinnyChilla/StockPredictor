@@ -21,4 +21,4 @@ EXPOSE 8000
 # E.g., If main.py is at the root, you might run it differently or reorganize slightly.
 
 # Assuming main.py is in the root of your WORKDIR (/app)
-CMD ["uvicorn", "main:app", "--workers", "4", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--workers", "4", "--host", "0.0.0.0", "--port", "443"]
