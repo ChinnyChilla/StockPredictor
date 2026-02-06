@@ -17,7 +17,7 @@ from routers.stock import router as stock_router
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi.middleware.cors import CORSMiddleware
-
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -55,18 +55,25 @@ app.add_middleware(
 )
 
 def get_db_connection():
-	try:
-		session = mysql.connector.connect(
-			user=os.getenv("DATABASE_USERNAME"),
-			password=os.getenv("DATABASE_PASSWORD"),
-			host=os.getenv("DATABASE_HOST"),
-			database=os.getenv("DATABASE_BASE"),
-			port=os.getenv("DATABASE_PORT")
-		)
-		return session
-	except Error as e:
-		print(e)
-		raise HTTPException(status_code=500, detail="Could not connect to database")
+    try:
+        # Get the full internal URL from Render environment variables
+        db_url = os.getenv("INTERNAL_DATABASE_URL") 
+        
+        # Parse the URL into components
+        url = urlparse(db_url)
+        
+        session = mysql.connector.connect(
+            user=url.username,
+            password=url.password,
+            host=url.hostname,
+            port=url.port or 3306, # Default to 3306 if port is missing
+            database=url.path[1:], # Remove the leading '/' from the path
+            ssl_disabled=False     # Render often requires SSL; this ensures it stays on
+        )
+        return session
+    except Exception as e:
+        print(f"Database Connection Error: {e}")
+        raise HTTPException(status_code=500, detail="Could not connect to database")
 	
 
 @app.get("/")
