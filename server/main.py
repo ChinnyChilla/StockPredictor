@@ -1,8 +1,9 @@
 from typing import Annotated
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Depends
 import yfinance as yf
 import math
 import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 # from tensorflow.keras.models import load_model
 import os
@@ -53,17 +54,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db_connection():
+def get_db():
+    conn = None
     try:
         db_url = os.getenv("INTERNAL_DATABASE_URL")
-        
-        session = psycopg2.connect(db_url)
-        
-        return session
+        conn = psycopg2.connect(db_url)
+        yield conn
     except Exception as e:
         print(f"Database Connection Error: {e}")
-        raise HTTPException(status_code=500, detail="Could not connect to Postgres database")
-	
+        raise HTTPException(status_code=500, detail="Database connection failed")
+    finally:
+        if conn:
+            conn.close()
 
 @app.get("/")
 async def root():
@@ -119,29 +121,20 @@ async def get_earnings_prediction(stock: Annotated[str, Path(title="The ticker t
 	return earnings.compute_recommendation(stock)
 
 @app.get("/api/earnings")
-async def get_all_earnings():
-	db = get_db_connection()
-
-	if db.closed != 0:
-		raise HTTPException(status_code=500, detail="Could not connect to database")
-	
-	cursor = db.cursor()
+async def get_all_earnings(db = Depends(get_db)):
+	cursor = db.cursor(cursor_factory=RealDictCursor)
 
 	cursor.execute("SELECT * FROM earnings")
 	columns = [description[0] for description in cursor.description]
 	earnings_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
-
+	cursor.close()
 	return earnings_list
 
 @app.post("/api/earnings", status_code=201)
-async def post_next_week_earnings():
+async def post_next_week_earnings(db = Depends(get_db)):
 	print("Adding to earnings table")
-	db = get_db_connection()
 
-	if db.closed != 0:
-		raise HTTPException(status_code=500, detail="Could not connect to database")
-	
-	cursor = db.cursor()
+	cursor = db.cursor(cursor_factory=RealDictCursor)
 
 	next_week_earnings = earnings.get_earnings_calendar()
 
@@ -217,17 +210,16 @@ async def post_next_week_earnings():
 	return {"message": f'Added {rowCount} rows'}
 
 @app.delete("/api/earnings")
-async def delete_week_old_earnings():
+async def delete_week_old_earnings(db = Depends(get_db)):
 	print("Deleting eanrings older than today")
-	db = get_db_connection()
 
 	if db.closed != 0:
 		raise HTTPException(status_code=500, detail="Could not connect to database")
 
-	cursor = db.cursor()
+	cursor = db.cursor(cursor_factory=RealDictCursor)
 
 	cursor.execute("DELETE FROM earnings WHERE earnings_date < CURRENT_DATE;")
 	db.commit()
 
-	db.close()
+	cursor.close()
 	return {"message": f'Successfully deleted {0} rows'.format(cursor.rowcount)}
