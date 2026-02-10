@@ -1,6 +1,6 @@
 import yfinance as yf
 from datetime import datetime, timedelta
-from scipy.interpolate import interp1d
+import numpy as np
 import numpy as np
 from dotenv import load_dotenv
 import finnhub
@@ -8,6 +8,26 @@ import os
 from fastapi import APIRouter
 
 load_dotenv()
+
+def interp1d(x, y, kind='linear', fill_value='extrapolate'):
+    """
+    A lightweight, NumPy-only replacement for scipy.interpolate.interp1d
+    to save ~150MB of deployment space on Vercel.
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+    
+    # Sort x and y by x values (required for np.interp)
+    if np.any(np.diff(x) < 0):
+        idx = np.argsort(x)
+        x = x[idx]
+        y = y[idx]
+
+    # This inner function makes the result "callable" like the original
+    def interpolator(x_new):
+        return np.interp(x_new, x, y)
+
+    return interpolator
 
 finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 
