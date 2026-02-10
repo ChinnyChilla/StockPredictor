@@ -29,8 +29,6 @@ def interp1d(x, y, kind='linear', fill_value='extrapolate'):
 
     return interpolator
 
-finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
-
 router = APIRouter()
 
 def get_earnings_calendar():

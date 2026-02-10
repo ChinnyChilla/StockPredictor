@@ -27,7 +27,7 @@ app.include_router(stock_router, prefix="/api")
 # app.include_router(foodi_router, prefix="/api")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://chinny.net", "https://www.chinny.net"],
+    allow_origins=["https://chinny.net", "https://www.chinny.net", "http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
