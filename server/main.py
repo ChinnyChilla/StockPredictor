@@ -167,10 +167,10 @@ async def post_next_week_earnings(db = Depends(get_db)):
 					earning['date'],
 					earning['hour'],
 					prediction['expected_move'][:-1],
-					round(prediction['avg_volume'], ndigits=2),
-					round(prediction['iv30_rv30'], ndigits=10),
-					round(prediction['ts_slope_0_45'], ndigits=10),
-					round(earning['epsEstimate'], ndigits=2),
+					float(round(prediction['avg_volume'], ndigits=2)),
+					float(round(prediction['iv30_rv30'], ndigits=10)),
+					float(round(prediction['ts_slope_0_45'], ndigits=10)),
+					float(round(earning['epsEstimate'], ndigits=2)),
 					prediction['rating'])
 				if math.isnan(prediction['ts_slope_0_45']):
 					continue
