@@ -77,7 +77,7 @@ export default function OptionsCard({ ticker }: { ticker: string }) {
 		async function fetchExpirations() {
 			setLoadingExpirations(true)
 			try {
-				const response = await fetch(getApiUrl(`/api/stock/${ticker}/options/allExpirationDates`))
+				const response = await fetch(getApiUrl(`/api/option/${ticker}/allExpirationDates`))
 				if (!response.ok) throw new Error("Failed to load expiration dates.")
 				const data = await response.json()
 				if (Array.isArray(data) && data.length > 0) {
@@ -107,7 +107,7 @@ export default function OptionsCard({ ticker }: { ticker: string }) {
 			setError(null)
 
 			try {
-				const response = await fetch(getApiUrl(`/api/stock/${ticker}/options?expiration=${selectedExpiration}`))
+				const response = await fetch(getApiUrl(`/api/option/${ticker}?expiration=${selectedExpiration}`))
 				if (!response.ok) throw new Error("Failed to load options chain.")
 				const data = await response.json()
 				setOptionsChain(data)

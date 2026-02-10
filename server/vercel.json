@@ -2,7 +2,11 @@
 	"crons": [
 		{
 			"path": "/api/cron/updateEarnings",
-			"schedule": "0 5 * * 1"
+			"schedule": "0 9 * * 2-6"
+		},
+		{
+			"path": "/api/cron/deleteBeforeMarket",
+			"schedule": "0 15 * * 1-5"
 		}
 	]
 }

@@ -90,7 +90,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 
 		const interval = setInterval(async () => {
 			try {
-				const response = await fetch(getApiUrl(`/api/stocks/${ticker}/currentPrice`))
+				const response = await fetch(getApiUrl(`/api/stock/${ticker}/currentPrice`))
 				if (!response.ok) throw new Error("Failed to fetch current price")
 				const data = await response.json()
 				setLivePriceData(data)
@@ -102,7 +102,7 @@ export default function SingleStockView({ ticker }: { ticker: string }) {
 			// Initial fetch
 			; (async () => {
 				try {
-					const response = await fetch(getApiUrl(`/api/stocks/${ticker}/currentPrice`))
+					const response = await fetch(getApiUrl(`/api/stock/${ticker}/currentPrice`))
 					if (!response.ok) throw new Error("Failed to fetch current price")
 					const data = await response.json()
 					setLivePriceData(data)
