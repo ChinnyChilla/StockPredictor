@@ -15,33 +15,11 @@ from routers.earnings import router as earnings_router
 from routers.stock import router as stock_router
 # from foodi.foodi import router as foodi_router
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi.middleware.cors import CORSMiddleware
-from urllib.parse import urlparse
 
 load_dotenv()
 
-async def lifespan(app: FastAPI):
-
-	# model = load_model('./foodi/foodi_model.h5')
-	# app.state.model = model
-
-	scheduler = AsyncIOScheduler(timezone='America/New_York', standalone=True)
-	scheduler.add_job(
-		delete_week_old_earnings,
-		trigger="cron",
-		hour=1, minute=0
-	)
-	scheduler.add_job(
-		post_next_week_earnings,
-		trigger="cron",
-		hour=13, minute=0, day_of_week='mon-fri'
-	)
-	scheduler.start()
-	yield
-	scheduler.shutdown()
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.include_router(market_router, prefix="/api")
 app.include_router(earnings_router, prefix="/api")

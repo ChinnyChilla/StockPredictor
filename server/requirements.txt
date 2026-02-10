@@ -1,10 +1,5 @@
 fastapi
 finnhub_python
-numpy
 python-dotenv
-scipy
 yfinance
-apscheduler
-uvicorn
-gunicorn
 psycopg2-binary
