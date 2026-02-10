@@ -3,3 +3,4 @@ finnhub_python
 python-dotenv
 yfinance
 psycopg2-binary
+scipy
