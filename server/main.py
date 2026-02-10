@@ -103,8 +103,7 @@ async def get_all_earnings(db = Depends(get_db)):
 	cursor = db.cursor(cursor_factory=RealDictCursor)
 
 	cursor.execute("SELECT * FROM earnings")
-	columns = [description[0] for description in cursor.description]
-	earnings_list = [dict(zip(columns, row)) for row in cursor.fetchall()]
+	earnings_list = cursor.fetchall()
 	cursor.close()
 	return earnings_list
 
