@@ -111,7 +111,7 @@ export default function HomePage() {
 							</div>
 
 							{/* The timeline dot and icon */}
-							<div className="absolute left-1/2 top-1/2 z-10 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-primary bg-background md:order-2">
+							<div className="hidden md:absolute md:left-1/2 md:top-1/2 md:z-10 md:flex md:h-10 md:w-10 md:-translate-x-1/2 md:-translate-y-1/2 md:items-center md:justify-center md:rounded-full md:border-2 md:border-primary md:bg-background md:order-2">
 								{exp.type === 'work' ? <Briefcase className="h-5 w-5 text-primary" /> : <GraduationCap className="h-5 w-5 text-primary" />}
 							</div>
 						</div>
