@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import FastAPI, Path, HTTPException, Depends
+from fastapi import FastAPI, Path, HTTPException, Depends, Request
 import yfinance as yf
 import math
 import psycopg2
@@ -201,3 +201,14 @@ async def delete_week_old_earnings(db = Depends(get_db)):
 
 	cursor.close()
 	return {"message": f'Successfully deleted {0} rows'.format(cursor.rowcount)}
+
+@app.get("/api/cron/updateEarnings")
+async def cron_job_fetch_earnings(request: Request, db=Depends(get_db)):
+	if request.headers.get("user-agent") != "vercel-cron/1.0":
+		raise HTTPException(status_code=401, detail="Unauthorized")
+    
+	await delete_week_old_earnings(db)
+	
+	await post_next_week_earnings(db)
+	
+	return {"status": "Cron completed: cleanup and update done"}
