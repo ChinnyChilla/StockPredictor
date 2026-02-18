@@ -53,8 +53,13 @@ async def post_next_week_earnings(db = Depends(get_db)):
 				if prediction['message'].startswith('Error'):
 					print(f"Error processing {earning['ticker']}: {prediction['message']}")
 					continue
+				try:
+					val = prediction['expected_move']
+					expected_move = float(str(val)[:-1]) if val is not None else 0.0
+				except (ValueError, TypeError, AttributeError):
+					expected_move = 0.0
 				values = (
-					prediction['expected_move'][:-1],
+					expected_move,
 					float(round(prediction['avg_volume'], ndigits=2)),
 					float(round(prediction['iv30_rv30'], ndigits=10)),
 					float(round(prediction['ts_slope_0_45'], ndigits=10)),
